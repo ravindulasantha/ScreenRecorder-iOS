@@ -1,4 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Required for Android 14 (API 34+) to specify foreground service type -->
+    <!-- The flutter_overlay_window uses a foreground service to keep the overlay active. -->
+    <!-- Common types include: connectedDevice, mediaPlayback, mediaProjection, phoneCall. -->
+    <!-- For a general overlay, 'specialUse' without a specific subtype might be initially
+         attempted, but if a more specific one fits the overlay's purpose, it's better.
+         If the overlay is primarily for controlling media projection (screen recording),
+         then 'mediaProjection' could be relevant here too. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+
     <application
         android:label="screen_recorder"
         android:name="${applicationName}"
@@ -30,6 +43,22 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Service for flutter_overlay_window -->
+        <service android:name="com.pravera.flutter_overlay_window.OverlayService" android:exported="false">
+            <!-- For Android 14+ (API 34+) -->
+            <!-- If your foreground service is of type 'mediaProjection', 'mediaPlayback', etc.
+                 You must declare the specific type here.
+                 The PROPERTY_SPECIAL_USE_FGS_SUBTYPE is for cases where the foreground service
+                 doesn't fit into the predefined types and requires a special use declaration.
+                 For an overlay that controls screen recording (a mediaProjection type),
+                 it's good practice to align this if the overlay service itself is considered
+                 part of that mediaProjection lifecycle or control.
+                 Consult flutter_overlay_window documentation for specific recommendations.
+                 A common one, if the overlay is part of media projection: -->
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="media_projection" />
+        </service>
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
